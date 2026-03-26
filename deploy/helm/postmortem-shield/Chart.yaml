@@ -1,0 +1,6 @@
+apiVersion: v2
+name: postmortem-shield
+description: Convert postmortems into validated prevention artifacts
+version: 0.1.0
+appVersion: "0.1.0"
+type: application

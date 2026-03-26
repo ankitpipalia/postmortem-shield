@@ -1,0 +1,91 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: shield-pm-2026-03-11-payment-api
+  annotations:
+    postmortem-shield/incident: pm-2026-03-11-payment-api
+    postmortem-shield/findings: F001,F002,F003
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+  - name: enforce-guardrails-f001
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: 'Finding F001: Autoscaling ceiling delayed recovery under burst traffic..
+        Trace: postmortem://pm-2026-03-11-payment-api#F001'
+      pattern:
+        metadata:
+          labels:
+            app.kubernetes.io/name: payment-api
+        spec:
+          containers:
+          - (name): '*'
+            resources:
+              requests:
+                cpu: ?*
+                memory: ?*
+              limits:
+                cpu: ?*
+                memory: ?*
+            readinessProbe:
+              httpGet:
+                path: ?*
+                port: ?*
+  - name: enforce-guardrails-f002
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: 'Finding F002: Readiness probes allowed stale Redis connections.. Trace:
+        postmortem://pm-2026-03-11-payment-api#F002'
+      pattern:
+        metadata:
+          labels:
+            app.kubernetes.io/name: payment-api
+        spec:
+          containers:
+          - (name): '*'
+            resources:
+              requests:
+                cpu: ?*
+                memory: ?*
+              limits:
+                cpu: ?*
+                memory: ?*
+            readinessProbe:
+              httpGet:
+                path: ?*
+                port: ?*
+  - name: enforce-guardrails-f003
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: 'Finding F003: Cache failover chaos coverage was missing.. Trace: postmortem://pm-2026-03-11-payment-api#F003'
+      pattern:
+        metadata:
+          labels:
+            app.kubernetes.io/name: redis-cluster
+        spec:
+          containers:
+          - (name): '*'
+            resources:
+              requests:
+                cpu: ?*
+                memory: ?*
+              limits:
+                cpu: ?*
+                memory: ?*
+            readinessProbe:
+              httpGet:
+                path: ?*
+                port: ?*

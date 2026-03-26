@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  postmortem-shield:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./samples:/app/samples
+    command: uvicorn postmortem_shield.api.main:app --host 0.0.0.0 --port 8000

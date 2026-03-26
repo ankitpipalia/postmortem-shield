@@ -1,0 +1,41 @@
+groups:
+- name: postmortem-shield.pm-2026-03-11-payment-api
+  rules:
+  - alert: PostmortemShieldF001
+    expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service="payment-api"}[5m]))
+      by (le)) > 0.75
+    for: 2m
+    labels:
+      severity: high
+      incident_id: pm-2026-03-11-payment-api
+      finding_id: F001
+    annotations:
+      summary: Autoscaling ceiling delayed recovery under burst traffic.
+      description: HPA hit maxReplicas=12 for 11 minutes while p95 latency stayed
+        above 900ms.
+      traceability: postmortem://pm-2026-03-11-payment-api#F001
+  - alert: PostmortemShieldF002
+    expr: sum(rate(http_requests_total{service="payment-api",status=~"5.."}[5m]))
+      / sum(rate(http_requests_total{service="payment-api"}[5m])) > 0.03
+    for: 1m
+    labels:
+      severity: critical
+      incident_id: pm-2026-03-11-payment-api
+      finding_id: F002
+    annotations:
+      summary: Readiness probes allowed stale Redis connections.
+      description: 23% of restarted pods returned 5xx for the first two minutes after
+        start.
+      traceability: postmortem://pm-2026-03-11-payment-api#F002
+  - alert: PostmortemShieldF003
+    expr: sum(rate(http_requests_total{service="redis-cluster",status=~"5.."}[5m]))
+      / sum(rate(http_requests_total{service="redis-cluster"}[5m])) > 0.03
+    for: 5m
+    labels:
+      severity: medium
+      incident_id: pm-2026-03-11-payment-api
+      finding_id: F003
+    annotations:
+      summary: Cache failover chaos coverage was missing.
+      description: No recorded game-day validating cache failover in the last 90 days.
+      traceability: postmortem://pm-2026-03-11-payment-api#F003

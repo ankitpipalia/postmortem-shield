@@ -1,0 +1,94 @@
+{
+  "prometheus-rules.yaml": [
+    {
+      "finding_id": "F001",
+      "title": "Autoscaling ceiling delayed recovery under burst traffic.",
+      "evidence": "HPA hit maxReplicas=12 for 11 minutes while p95 latency stayed above 900ms.",
+      "component": "payment-api",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F001"
+    },
+    {
+      "finding_id": "F002",
+      "title": "Readiness probes allowed stale Redis connections.",
+      "evidence": "23% of restarted pods returned 5xx for the first two minutes after start.",
+      "component": "payment-api",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F002"
+    },
+    {
+      "finding_id": "F003",
+      "title": "Cache failover chaos coverage was missing.",
+      "evidence": "No recorded game-day validating cache failover in the last 90 days.",
+      "component": "redis-cluster",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F003"
+    }
+  ],
+  "kyverno-policy.yaml": [
+    {
+      "finding_id": "F001",
+      "title": "Autoscaling ceiling delayed recovery under burst traffic.",
+      "evidence": "HPA hit maxReplicas=12 for 11 minutes while p95 latency stayed above 900ms.",
+      "component": "payment-api",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F001"
+    },
+    {
+      "finding_id": "F002",
+      "title": "Readiness probes allowed stale Redis connections.",
+      "evidence": "23% of restarted pods returned 5xx for the first two minutes after start.",
+      "component": "payment-api",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F002"
+    },
+    {
+      "finding_id": "F003",
+      "title": "Cache failover chaos coverage was missing.",
+      "evidence": "No recorded game-day validating cache failover in the last 90 days.",
+      "component": "redis-cluster",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F003"
+    }
+  ],
+  "chaos-engine.yaml": [
+    {
+      "finding_id": "F001",
+      "title": "Autoscaling ceiling delayed recovery under burst traffic.",
+      "evidence": "HPA hit maxReplicas=12 for 11 minutes while p95 latency stayed above 900ms.",
+      "component": "payment-api",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F001"
+    },
+    {
+      "finding_id": "F002",
+      "title": "Readiness probes allowed stale Redis connections.",
+      "evidence": "23% of restarted pods returned 5xx for the first two minutes after start.",
+      "component": "payment-api",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F002"
+    },
+    {
+      "finding_id": "F003",
+      "title": "Cache failover chaos coverage was missing.",
+      "evidence": "No recorded game-day validating cache failover in the last 90 days.",
+      "component": "redis-cluster",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F003"
+    }
+  ],
+  "policy.rego": [
+    {
+      "finding_id": "F001",
+      "title": "Autoscaling ceiling delayed recovery under burst traffic.",
+      "evidence": "HPA hit maxReplicas=12 for 11 minutes while p95 latency stayed above 900ms.",
+      "component": "payment-api",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F001"
+    },
+    {
+      "finding_id": "F002",
+      "title": "Readiness probes allowed stale Redis connections.",
+      "evidence": "23% of restarted pods returned 5xx for the first two minutes after start.",
+      "component": "payment-api",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F002"
+    },
+    {
+      "finding_id": "F003",
+      "title": "Cache failover chaos coverage was missing.",
+      "evidence": "No recorded game-day validating cache failover in the last 90 days.",
+      "component": "redis-cluster",
+      "trace": "postmortem://pm-2026-03-11-payment-api#F003"
+    }
+  ]
+}

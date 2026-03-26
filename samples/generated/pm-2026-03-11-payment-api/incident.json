@@ -1,0 +1,57 @@
+{
+  "incident_id": "pm-2026-03-11-payment-api",
+  "title": "Payment API latency spike during cache failover",
+  "source_file": "samples/postmortems/payment-api-latency.md",
+  "occurred_at": "2026-03-11T09:20:00Z",
+  "summary": "A Redis primary failover increased upstream latency and surfaced weak deployment guardrails in the payment API tier.",
+  "impact": "Checkout success rate dropped from 99.4% to 94.8% for 18 minutes, triggering customer-visible payment failures in two regions.",
+  "services": [
+    "payment-api",
+    "redis-cluster"
+  ],
+  "root_causes": [
+    "HPA max replicas cap was too low for failover burst traffic.",
+    "Pods were considered ready before warm connections to Redis were established.",
+    "Chaos drills for cache failover had not run in the previous quarter."
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "title": "Autoscaling ceiling delayed recovery under burst traffic.",
+      "evidence": "HPA hit maxReplicas=12 for 11 minutes while p95 latency stayed above 900ms.",
+      "impacted_component": "payment-api",
+      "signal": "latency",
+      "severity": "high"
+    },
+    {
+      "id": "F002",
+      "title": "Readiness probes allowed stale Redis connections.",
+      "evidence": "23% of restarted pods returned 5xx for the first two minutes after start.",
+      "impacted_component": "payment-api",
+      "signal": "error_rate",
+      "severity": "critical"
+    },
+    {
+      "id": "F003",
+      "title": "Cache failover chaos coverage was missing.",
+      "evidence": "No recorded game-day validating cache failover in the last 90 days.",
+      "impacted_component": "redis-cluster",
+      "signal": "availability",
+      "severity": "medium"
+    }
+  ],
+  "timeline": [
+    {
+      "timestamp": "2026-03-11T09:20:00Z",
+      "description": "Alert fired for elevated payment API latency."
+    },
+    {
+      "timestamp": "2026-03-11T09:27:00Z",
+      "description": "Redis failover completed and write traffic resumed."
+    },
+    {
+      "timestamp": "2026-03-11T09:38:00Z",
+      "description": "Scale-out stabilized; p95 latency fell below 400ms."
+    }
+  ]
+}

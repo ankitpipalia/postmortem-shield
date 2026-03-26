@@ -1,0 +1,47 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: shield-pm-2026-03-11-payment-api
+  namespace: litmus
+  annotations:
+    postmortem-shield/incident: pm-2026-03-11-payment-api
+    postmortem-shield/findings: F001,F002,F003
+spec:
+  appinfo:
+    appns: default
+    applabel: app=payment-api
+    appkind: deployment
+  chaosServiceAccount: litmus-admin
+  engineState: active
+  annotationCheck: 'false'
+  experiments:
+  - name: pod-network-latency
+    spec:
+      components:
+        env:
+        - name: TOTAL_CHAOS_DURATION
+          value: '60'
+        - name: RAMP_TIME
+          value: '15'
+        - name: TRACEABILITY_REF
+          value: postmortem://pm-2026-03-11-payment-api#F001
+  - name: pod-delete
+    spec:
+      components:
+        env:
+        - name: TOTAL_CHAOS_DURATION
+          value: '60'
+        - name: RAMP_TIME
+          value: '15'
+        - name: TRACEABILITY_REF
+          value: postmortem://pm-2026-03-11-payment-api#F002
+  - name: pod-delete
+    spec:
+      components:
+        env:
+        - name: TOTAL_CHAOS_DURATION
+          value: '60'
+        - name: RAMP_TIME
+          value: '15'
+        - name: TRACEABILITY_REF
+          value: postmortem://pm-2026-03-11-payment-api#F003

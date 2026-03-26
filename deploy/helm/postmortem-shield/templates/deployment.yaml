@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postmortem-shield
+  labels:
+    app.kubernetes.io/name: postmortem-shield
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postmortem-shield
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postmortem-shield
+    spec:
+      containers:
+        - name: postmortem-shield
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
