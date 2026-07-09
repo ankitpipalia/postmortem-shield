@@ -21,7 +21,8 @@ def validate_prometheus_rules(content: str) -> ValidationResult:
             text=True,
             check=False,
         )
-        messages = [line for line in (result.stdout + result.stderr).splitlines() if line.strip()]
+        raw = (result.stdout + result.stderr).replace(rule_path, "prometheus-rules.yaml")
+        messages = [line for line in raw.splitlines() if line.strip()]
         return ValidationResult(
             artifact_type=ArtifactType.PROMETHEUS_ALERTS,
             validator="promtool",

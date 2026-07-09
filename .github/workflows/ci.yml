@@ -33,4 +33,7 @@ jobs:
           make demo
           test -f samples/generated/pm-2026-03-11-payment-api/prometheus-rules.yaml
           test -f samples/generated/pm-2026-03-11-payment-api/traceability.json
-          git diff --exit-code -- samples/generated
+          # bundle-summary.json embeds which validators ran (promtool vs static
+          # fallback etc.), which varies by environment - exclude it from the
+          # determinism check; all artifact files must be byte-identical.
+          git diff --exit-code -- samples/generated ':(exclude)samples/generated/pm-2026-03-11-payment-api/bundle-summary.json'

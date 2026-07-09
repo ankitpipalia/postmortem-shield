@@ -17,7 +17,9 @@ def _structured_rego_validation(content: str) -> ValidationResult:
     if not re.search(r"^package\s+", content, flags=re.MULTILINE):
         ok = False
         messages.append("missing package declaration")
-    if "deny[" not in content and "deny [" not in content:
+    has_v1_deny = re.search(r"deny\s+contains\s+\w+\s+if", content) is not None
+    has_v0_deny = "deny[" in content or "deny [" in content
+    if not has_v1_deny and not has_v0_deny:
         ok = False
         messages.append("no deny rule found")
     if "postmortem://" not in content:
@@ -47,7 +49,8 @@ def validate_opa_policy(content: str) -> ValidationResult:
             text=True,
             check=False,
         )
-        output = [line for line in (result.stdout + result.stderr).splitlines() if line.strip()]
+        raw = (result.stdout + result.stderr).replace(policy_path, "policy.rego")
+        output = [line for line in raw.splitlines() if line.strip()]
         return ValidationResult(
             artifact_type=ArtifactType.OPA_POLICY,
             validator="opa check",

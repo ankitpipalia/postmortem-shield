@@ -9,7 +9,7 @@ def _deny_rule(incident_id: str, finding_id: str, title: str, component: str) ->
         f"{finding_id} ({title}): deployment {component} must define resources and probes "
         f"[trace=postmortem://{incident_id}#{finding_id}]"
     )
-    return f"""deny[msg] {{
+    return f"""deny contains msg if {{
   input.kind == \"Deployment\"
   input.metadata.labels[\"app.kubernetes.io/name\"] == \"{component}\"
   some i
@@ -22,10 +22,11 @@ def _deny_rule(incident_id: str, finding_id: str, title: str, component: str) ->
 
 def generate_opa_policy(incident: Incident) -> GeneratedArtifact:
     package_name = incident.incident_id.replace("-", "_")
+    # Rego v1 syntax (OPA >= 1.0 default; works on older OPA via rego.v1 import).
     parts = [
         f"package postmortem_shield.{package_name}",
         "",
-        "default deny = []",
+        "import rego.v1",
         "",
     ]
 

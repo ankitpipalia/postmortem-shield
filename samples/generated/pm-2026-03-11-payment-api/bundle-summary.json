@@ -78,10 +78,11 @@
       },
       "validation": {
         "artifact_type": "prometheus_alerts",
-        "validator": "static",
+        "validator": "promtool",
         "ok": true,
         "messages": [
-          "Prometheus rule schema checks passed (promtool not found)."
+          "Checking prometheus-rules.yaml",
+          "  SUCCESS: 3 rules found"
         ]
       }
     },
@@ -108,7 +109,7 @@
         "validator": "yaml-structure",
         "ok": true,
         "messages": [
-          "YAML structural checks passed (kubectl not found)."
+          "YAML structural checks passed (kubectl present but no cluster reachable)."
         ]
       }
     },
@@ -135,14 +136,14 @@
         "validator": "yaml-structure",
         "ok": true,
         "messages": [
-          "YAML structural checks passed (kubectl not found)."
+          "YAML structural checks passed (kubectl present but no cluster reachable)."
         ]
       }
     },
     {
       "artifact_type": "opa_policy",
       "filename": "policy.rego",
-      "content": "package postmortem_shield.pm_2026_03_11_payment_api\n\ndefault deny = []\n\n# Finding F001: HPA hit maxReplicas=12 for 11 minutes while p95 latency stayed above 900ms.\ndeny[msg] {\n  input.kind == \"Deployment\"\n  input.metadata.labels[\"app.kubernetes.io/name\"] == \"payment-api\"\n  some i\n  container := input.spec.template.spec.containers[i]\n  not container.resources.limits.cpu\n  msg := \"F001 (Autoscaling ceiling delayed recovery under burst traffic.): deployment payment-api must define resources and probes [trace=postmortem://pm-2026-03-11-payment-api#F001]\"\n}\n\n# Finding F002: 23% of restarted pods returned 5xx for the first two minutes after start.\ndeny[msg] {\n  input.kind == \"Deployment\"\n  input.metadata.labels[\"app.kubernetes.io/name\"] == \"payment-api\"\n  some i\n  container := input.spec.template.spec.containers[i]\n  not container.resources.limits.cpu\n  msg := \"F002 (Readiness probes allowed stale Redis connections.): deployment payment-api must define resources and probes [trace=postmortem://pm-2026-03-11-payment-api#F002]\"\n}\n\n# Finding F003: No recorded game-day validating cache failover in the last 90 days.\ndeny[msg] {\n  input.kind == \"Deployment\"\n  input.metadata.labels[\"app.kubernetes.io/name\"] == \"redis-cluster\"\n  some i\n  container := input.spec.template.spec.containers[i]\n  not container.resources.limits.cpu\n  msg := \"F003 (Cache failover chaos coverage was missing.): deployment redis-cluster must define resources and probes [trace=postmortem://pm-2026-03-11-payment-api#F003]\"\n}\n",
+      "content": "package postmortem_shield.pm_2026_03_11_payment_api\n\nimport rego.v1\n\n# Finding F001: HPA hit maxReplicas=12 for 11 minutes while p95 latency stayed above 900ms.\ndeny contains msg if {\n  input.kind == \"Deployment\"\n  input.metadata.labels[\"app.kubernetes.io/name\"] == \"payment-api\"\n  some i\n  container := input.spec.template.spec.containers[i]\n  not container.resources.limits.cpu\n  msg := \"F001 (Autoscaling ceiling delayed recovery under burst traffic.): deployment payment-api must define resources and probes [trace=postmortem://pm-2026-03-11-payment-api#F001]\"\n}\n\n# Finding F002: 23% of restarted pods returned 5xx for the first two minutes after start.\ndeny contains msg if {\n  input.kind == \"Deployment\"\n  input.metadata.labels[\"app.kubernetes.io/name\"] == \"payment-api\"\n  some i\n  container := input.spec.template.spec.containers[i]\n  not container.resources.limits.cpu\n  msg := \"F002 (Readiness probes allowed stale Redis connections.): deployment payment-api must define resources and probes [trace=postmortem://pm-2026-03-11-payment-api#F002]\"\n}\n\n# Finding F003: No recorded game-day validating cache failover in the last 90 days.\ndeny contains msg if {\n  input.kind == \"Deployment\"\n  input.metadata.labels[\"app.kubernetes.io/name\"] == \"redis-cluster\"\n  some i\n  container := input.spec.template.spec.containers[i]\n  not container.resources.limits.cpu\n  msg := \"F003 (Cache failover chaos coverage was missing.): deployment redis-cluster must define resources and probes [trace=postmortem://pm-2026-03-11-payment-api#F003]\"\n}\n",
       "finding_ids": [
         "F001",
         "F002",
@@ -160,10 +161,10 @@
       },
       "validation": {
         "artifact_type": "opa_policy",
-        "validator": "structured",
+        "validator": "opa check",
         "ok": true,
         "messages": [
-          "OPA-style policy structural checks passed (opa/conftest not found)."
+          "opa check returned no output"
         ]
       }
     }

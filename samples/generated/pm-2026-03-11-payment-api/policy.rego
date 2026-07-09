@@ -1,9 +1,9 @@
 package postmortem_shield.pm_2026_03_11_payment_api
 
-default deny = []
+import rego.v1
 
 # Finding F001: HPA hit maxReplicas=12 for 11 minutes while p95 latency stayed above 900ms.
-deny[msg] {
+deny contains msg if {
   input.kind == "Deployment"
   input.metadata.labels["app.kubernetes.io/name"] == "payment-api"
   some i
@@ -13,7 +13,7 @@ deny[msg] {
 }
 
 # Finding F002: 23% of restarted pods returned 5xx for the first two minutes after start.
-deny[msg] {
+deny contains msg if {
   input.kind == "Deployment"
   input.metadata.labels["app.kubernetes.io/name"] == "payment-api"
   some i
@@ -23,7 +23,7 @@ deny[msg] {
 }
 
 # Finding F003: No recorded game-day validating cache failover in the last 90 days.
-deny[msg] {
+deny contains msg if {
   input.kind == "Deployment"
   input.metadata.labels["app.kubernetes.io/name"] == "redis-cluster"
   some i
